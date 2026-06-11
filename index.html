@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEMA PRO | Premium Archive</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-icons/0.279.0/umd/lucide.min.js"></script>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div id="ambient-background" class="ambient-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="logo">CINEMA<span>PRO</span></div>
+            <div class="nav-links">
+                <a href="#" data-filter="all" class="active">Home</a>
+                <a href="#" data-filter="movie">Movies</a>
+                <a href="#" data-filter="series">TV Series</a>
+                <a href="#" data-filter="trending">Trending</a>
+                <a href="#" data-filter="favorites">Favorites</a>
+            </div>
+            <div class="nav-actions">
+                <div class="search-container">
+                    <i data-lucide="search"></i>
+                    <input type="text" id="main-search" placeholder="Search 10,000+ titles...">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="glitch-text" data-text="UNLIMITED MOVIES">UNLIMITED MOVIES</h1>
+                <p>Experience the future of cinematic archives. 4K quality metadata at your fingertips.</p>
+                <div class="hero-btns">
+                    <button class="btn-primary">Browse Collection</button>
+                    <button class="btn-secondary" id="random-pick">Surprise Me</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters Bar -->
+        <section class="controls-bar">
+            <div class="filter-group">
+                <select id="genre-filter"><option value="">All Genres</option></select>
+                <select id="year-filter"><option value="">All Years</option></select>
+                <select id="sort-filter">
+                    <option value="newest">Newest First</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="az">A - Z</option>
+                </select>
+            </div>
+            <div class="stats" id="total-count">Loading database...</div>
+        </section>
+
+        <!-- Movie Grid -->
+        <div class="movie-grid" id="movie-grid">
+            <!-- Items injected by JS -->
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="sentinel" class="loading-trigger">
+            <div class="spinner"></div>
+        </div>
+    </main>
+
+    <!-- Detailed Modal -->
+    <div id="movie-modal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content glass">
+            <button class="close-modal"><i data-lucide="x"></i></button>
+            <div class="modal-body">
+                <div class="modal-poster">
+                    <img id="modal-img" src="" alt="">
+                </div>
+                <div class="modal-info">
+                    <h2 id="modal-title"></h2>
+                    <div class="modal-meta">
+                        <span id="modal-year"></span>
+                        <span id="modal-rating"></span>
+                        <span id="modal-runtime"></span>
+                    </div>
+                    <p id="modal-desc"></p>
+                    <div id="dynamic-fields" class="dynamic-meta"></div>
+                    <div class="modal-actions">
+                        <button class="btn-primary" id="fav-btn">Add to Favorites</button>
+                        <a id="download-link" href="#" class="btn-secondary">Download / Stream</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
