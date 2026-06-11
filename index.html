@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMax | Premium Movie Database</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-content">
+            <div class="logo-animation">CINE<span>MAX</span></div>
+            <p id="loading-status">Loading Movie Database...</p>
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="error-message" style="display:none;">Database unavailable. Please try again later.</p>
+        </div>
+    </div>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo">CINE<span>MAX</span></div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search 12,000+ movies...">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="nav-actions">
+                <button id="favoritesBtn"><i class="fas fa-heart"></i> Favorites</button>
+                <button id="historyBtn"><i class="fas fa-history"></i> History</button>
+            </div>
+        </nav>
+
+        <div class="filters-container">
+            <select id="genreFilter">
+                <option value="all">All Genres</option>
+            </select>
+            <select id="yearFilter">
+                <option value="all">All Years</option>
+            </select>
+            <select id="sortFilter">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="rating">Highest Rated</option>
+                <option value="az">A - Z</option>
+            </select>
+        </div>
+    </header>
+
+    <main>
+        <div id="movie-grid" class="movie-grid">
+            <!-- Movies injected here -->
+        </div>
+
+        <div id="pagination">
+            <button id="prevPage" class="pag-btn" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+            <span id="pageInfo">Page 1 of 1</span>
+            <button id="nextPage" class="pag-btn">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
+
+    <!-- Movie Modal -->
+    <div id="movieModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalDetails"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
