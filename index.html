@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاهیان | جستجوی هوشمند فیلم</title>
+    
+    <!-- Fonts: Lalezar for Titles, Vazirmatn for Body -->
+    <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@100;300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --orange: #FF4500;
+            --purple: #7851A9;
+            --gold: #D4AF37;
+            --black: #0A0A0A;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neon-orange: 0 0 15px rgba(255, 69, 0, 0.5);
+            --neon-purple: 0 0 15px rgba(120, 81, 169, 0.5);
+            --neon-gold: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--black);
+            color: #fff;
+            font-family: 'Vazirmatn', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- Background Animation --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .emoji {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            filter: blur(1px);
+            user-select: none;
+            will-change: transform;
+        }
+
+        /* --- UI Components --- */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+        }
+
+        /* --- Loader & Error --- */
+        #status-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--glass);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #error-view {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .btn-retry {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: var(--orange);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Lalezar';
+            font-size: 1.2rem;
+        }
+
+        /* --- Landing Page --- */
+        #landing-page {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #landing-page.hidden {
+            transform: translateY(-100vh);
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .main-title {
+            font-family: 'Lalezar', cursive;
+            font-size: clamp(4rem, 15vw, 8rem);
+            color: var(--gold);
+            text-shadow: var(--neon-gold);
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .main-search {
+            width: 100%;
+            padding: 20px 30px;
+            font-size: 1.3rem;
+            background: var(--glass);
+            border: 2px solid var(--glass-border);
+            border-radius: 50px;
+            color: #fff;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .main-search:focus {
+            border-color: var(--purple);
+            box-shadow: var(--neon-purple);
+            transform: scale(1.02);
+        }
+
+        /* --- Results Page --- */
+        #results-page {
+            display: none;
+            padding: 20px 5% 50px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #results-page.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .mini-title {
+            font-family: 'Lalezar';
+            font-size: 2.5rem;
+            color: var(--gold);
+            text-shadow: var(--neon-gold);
+            cursor: pointer;
+        }
+
+        .result-stats {
+            font-size: 0.9rem;
+            color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+        }
+
+        /* --- Movie Grid --- */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .movie-card {
+            padding: 25px;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: var(--neon-orange);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .card-title {
+            font-family: 'Lalezar';
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .rating-badge {
+            color: var(--gold);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- Pagination --- */
+        .pagination {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .pag-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .pag-btn:hover:not(:disabled) {
+            background: var(--purple);
+            border-color: var(--gold);
+        }
+
+        .pag-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* --- Modal --- */
+        #modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        #modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            transform: scale(0.9);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--orange);
+        }
+
+        .modal-title {
+            font-family: 'Lalezar';
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .modal-desc {
+            line-height: 1.8;
+            color: #eee;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        .modal-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .meta-box {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .meta-label { font-size: 0.75rem; color: var(--gold); display: block; }
+        .meta-value { font-weight: bold; font-size: 0.95rem; }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-main {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Lalezar';
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-dl { background: linear-gradient(45deg, var(--orange), var(--purple)); color: #fff; }
+        .btn-fav { background: var(--glass); color: #fff; border: 1px solid var(--glass-border); }
+        .btn-fav.is-fav { border-color: var(--gold); color: var(--gold); box-shadow: var(--neon-gold); }
+
+        .btn-main:hover { transform: translateY(-3px); filter: brightness(1.2); }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+        /* --- Responsive --- */
+        @media (max-width: 600px) {
+            .modal { padding: 25px; }
+            .modal-title { font-size: 1.8rem; }
+            .nav-header { flex-direction: column; text-align: center; }
+            .main-search { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div id="bg-canvas"></div>
+
+    <!-- Status Overlays -->
+    <div id="status-overlay">
+        <div id="loader-view">
+            <div class="spinner"></div>
+            <p style="font-family: 'Lalezar'; font-size: 1.5rem; color: var(--gold);">در حال بارگذاری فیلم‌ها...</p>
+        </div>
+        <div id="error-view">
+            <h1 class="main-title" style="color: var(--orange);">خطا!</h1>
+            <p>متاسفانه دیتابیس بارگذاری نشد.</p>
+            <button class="btn-retry" onclick="location.reload()">تلاش مجدد</button>
+        </div>
+    </div>
+
+    <!-- Landing Page -->
+    <main id="landing-page">
+        <h1 class="main-title">شاهیان</h1>
+        <div class="search-container">
+            <input type="text" class="main-search" id="search-input" placeholder="نام فیلم یا توضیحات..." autocomplete="off">
+        </div>
+    </main>
+
+    <!-- Results Page -->
+    <section id="results-page">
+        <header class="nav-header">
+            <h2 class="mini-title" onclick="resetUI()">شاهیان</h2>
+            <div class="search-container" style="max-width: 400px;">
+                <input type="text" class="main-search" id="nav-search" style="padding: 12px 25px; font-size: 1rem;">
+            </div>
+            <div class="result-stats">
+                تعداد نتایج: <span id="count-val">0</span> مورد
+            </div>
+        </header>
+
+        <div class="movie-grid" id="movie-grid">
+            <!-- Cards injected here -->
+        </div>
+
+        <div class="pagination">
+            <button class="pag-btn" id="prev-btn" disabled>صفحه قبل</button>
+            <span id="page-info">صفحه ۱</span>
+            <button class="pag-btn" id="next-btn">صفحه بعد</button>
+        </div>
+    </section>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal glass-panel" id="modal-content">
+            <span class="modal-close" onclick="closeModal(event, true)">&times;</span>
+            <div id="modal-body">
+                <!-- Modal content injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Project SHAHIAN - Core Logic
+         */
+
+        const state = {
+            allMovies: [],
+            filtered: [],
+            favorites: JSON.parse(localStorage.getItem('shahian_favs')) || [],
+            history: JSON.parse(localStorage.getItem('shahian_hist')) || [],
+            currentPage: 1,
+            perPage: 20,
+            searchQuery: ''
+        };
+
+        const emojis = ['🎃', '☕', '🚏', '🎑', '📸', '🪄', '🎥', '🎬', '🎭'];
+
+        // --- Init ---
+        window.addEventListener('DOMContentLoaded', () => {
+            generateFloatingBackground();
+            fetchData();
+            setupSearchListeners();
+            setupPaginationListeners();
+        });
+
+        // --- Data Handling ---
+        async function fetchData() {
+            const overlay = document.getElementById('status-overlay');
+            const errorView = document.getElementById('error-view');
+            const loaderView = document.getElementById('loader-view');
+
+            try {
+                const response = await fetch('movies.json');
+                if (!response.ok) throw new Error('Fetch failed');
+                const data = await response.json();
+                
+                // Handle different JSON structures
+                if (Array.isArray(data)) {
+                    state.allMovies = data;
+                } else {
+                    state.allMovies = data.movies || data.data || data.items || [];
+                }
+
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 500);
+            } catch (err) {
+                console.error(err);
+                loaderView.style.display = 'none';
+                errorView.style.display = 'block';
+            }
+        }
+
+        // --- Background Animation ---
+        function generateFloatingBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const count = 15;
+
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'emoji';
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.top = Math.random() * 100 + 'vh';
+                
+                canvas.appendChild(el);
+                
+                animateEmoji(el);
+            }
+        }
+
+        function animateEmoji(el) {
+            const duration = 15000 + Math.random() * 20000;
+            const xMove = (Math.random() - 0.5) * 400;
+            const yMove = (Math.random() - 0.5) * 400;
+
+            el.animate([
+                { transform: 'translate(0, 0) rotate(0deg)', opacity: 0.15 },
+                { transform: `translate(${xMove}px, ${yMove}px) rotate(360deg)`, opacity: 0.1 },
+                { transform: 'translate(0, 0) rotate(720deg)', opacity: 0.15 }
+            ], {
+                duration: duration,
+                iterations: Infinity,
+                easing: 'ease-in-out'
+            });
+        }
+
+        // --- Search Logic ---
+        function setupSearchListeners() {
+            const mainSearch = document.getElementById('search-input');
+            const navSearch = document.getElementById('nav-search');
+
+            const handleInput = debounce((e) => {
+                state.searchQuery = e.target.value.trim();
+                if (state.searchQuery === '') {
+                    resetUI();
+                } else {
+                    performSearch();
+                }
+            }, 350);
+
+            mainSearch.addEventListener('input', handleInput);
+            navSearch.addEventListener('input', handleInput);
+        }
+
+        function performSearch() {
+            const landing = document.getElementById('landing-page');
+            const results = document.getElementById('results-page');
+            const navSearch = document.getElementById('nav-search');
+
+            state.filtered = state.allMovies.filter(m => {
+                const query = state.searchQuery.toLowerCase();
+                const title = (m.title || m.name || '').toLowerCase();
+                const desc = (m.description || m.overview || '').toLowerCase();
+                return title.includes(query) || desc.includes(query);
+            });
+
+            // Transition
+            landing.classList.add('hidden');
+            results.classList.add('visible');
+            navSearch.value = state.searchQuery;
+
+            state.currentPage = 1;
+            renderGrid();
+        }
+
+        function resetUI() {
+            document.getElementById('landing-page').classList.remove('hidden');
+            document.getElementById('results-page').classList.remove('visible');
+            document.getElementById('search-input').value = '';
+            state.searchQuery = '';
+        }
+
+        // --- Render Logic ---
+        function renderGrid() {
+            const grid = document.getElementById('movie-grid');
+            const start = (state.currentPage - 1) * state.perPage;
+            const end = start + state.perPage;
+            const pageData = state.filtered.slice(start, end);
+
+            document.getElementById('count-val').innerText = state.filtered.length;
+            grid.innerHTML = '';
+
+            if (pageData.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--gold);">موردی یافت نشد.</p>`;
+            }
+
+            pageData.forEach(movie => {
+                const card = document.createElement('div');
+                card.className = 'movie-card glass-panel';
+                card.innerHTML = `
+                    <h3 class="card-title">${movie.title || movie.name}</h3>
+                    <div class="card-meta">
+                        <span>${movie.year || movie.release_date?.split('-')[0] || '---'}</span>
+                        <div class="rating-badge">⭐ ${movie.rating || movie.vote_average || 'N/A'}</div>
+                    </div>
+                `;
+                card.onclick = () => openModal(movie);
+                grid.appendChild(card);
+            });
+
+            updatePaginationUI();
+        }
+
+        function updatePaginationUI() {
+            const totalPages = Math.ceil(state.filtered.length / state.perPage);
+            document.getElementById('page-info').innerText = `صفحه ${state.currentPage} از ${totalPages || 1}`;
+            document.getElementById('prev-btn').disabled = state.currentPage === 1;
+            document.getElementById('next-btn').disabled = state.currentPage === totalPages || totalPages === 0;
+        }
+
+        function setupPaginationListeners() {
+            document.getElementById('prev-btn').addEventListener('click', () => {
+                if (state.currentPage > 1) {
+                    state.currentPage--;
+                    renderGrid();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+            document.getElementById('next-btn').addEventListener('click', () => {
+                const totalPages = Math.ceil(state.filtered.length / state.perPage);
+                if (state.currentPage < totalPages) {
+                    state.currentPage++;
+                    renderGrid();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        }
+
+        // --- Modal & Actions ---
+        function openModal(movie) {
+            const overlay = document.getElementById('modal-overlay');
+            const body = document.getElementById('modal-body');
+            
+            // Detect Download Key
+            const dlKeys = ['downloadUrl', 'link', 'streamUrl', 'url', 'watch_link', 'download_link', 'stream'];
+            let dlUrl = '#';
+            for (let key of dlKeys) {
+                if (movie[key]) { dlUrl = movie[key]; break; }
+            }
+
+            const isFav = state.favorites.some(f => (f.id && f.id === movie.id) || f.title === movie.title);
+
+            body.innerHTML = `
+                <h2 class="modal-title">${movie.title || movie.name}</h2>
+                <div class="modal-meta-grid">
+                    <div class="meta-box"><span class="meta-label">سال</span><span class="meta-value">${movie.year || '---'}</span></div>
+                    <div class="meta-box"><span class="meta-label">امتیاز</span><span class="meta-value">${movie.rating || '---'}</span></div>
+                    <div class="meta-box"><span class="meta-label">ژانر</span><span class="meta-value">${movie.genre || movie.genres?.[0] || '---'}</span></div>
+                </div>
+                <p class="modal-desc">${movie.description || movie.overview || 'توضیحاتی برای این فیلم در دسترس نیست.'}</p>
+                <div class="modal-actions">
+                    ${dlUrl !== '#' ? `<a href="${dlUrl}" target="_blank" class="btn-main btn-dl">دانلود و تماشا</a>` : ''}
+                    <button class="btn-main btn-fav ${isFav ? 'is-fav' : ''}" onclick="toggleFavorite(event, ${JSON.stringify(movie).replace(/"/g, '&quot;')})">
+                        ${isFav ? 'حذف از علاقه‌مندی' : 'افزودن به علاقه‌مندی'}
+                    </button>
+                </div>
+            `;
+
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Add to history
+            updateHistory(movie);
+        }
+
+        function closeModal(e, force = false) {
+            if (force || e.target.id === 'modal-overlay') {
+                document.getElementById('modal-overlay').classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function toggleFavorite(e, movie) {
+            e.stopPropagation();
+            const index = state.favorites.findIndex(f => (f.id && f.id === movie.id) || f.title === movie.title);
+            
+            if (index > -1) {
+                state.favorites.splice(index, 1);
+                e.target.classList.remove('is-fav');
+                e.target.innerText = 'افزودن به علاقه‌مندی';
+            } else {
+                state.favorites.push(movie);
+                e.target.classList.add('is-fav');
+                e.target.innerText = 'حذف از علاقه‌مندی';
+            }
+            localStorage.setItem('shahian_favs', JSON.stringify(state.favorites));
+        }
+
+        function updateHistory(movie) {
+            state.history = state.history.filter(h => (h.id !== movie.id && h.title !== movie.title));
+            state.history.unshift(movie);
+            if (state.history.length > 50) state.history.pop();
+            localStorage.setItem('shahian_hist', JSON.stringify(state.history));
+        }
+
+        // --- Utils ---
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+    </script>
+</body>
+</html>
