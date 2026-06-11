@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shahian | شاهین - جستجوی فیلم</title>
+
+    <!-- Google Fonts: Lalezar for titles, Vazirmatn for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --orange: #FF4500;
+            --orange-glow: #FF6B35;
+            --purple: #7851A9;
+            --purple-glow: #9B6FC8;
+            --gold: #D4AF37;
+            --gold-light: #F0D060;
+            --bg: #0A0A0A;
+            --bg-card: rgba(20, 20, 20, 0.65);
+            --bg-modal: rgba(10, 10, 10, 0.92);
+            --text: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --border-glass: rgba(255, 255, 255, 0.12);
+            --border-gold: rgba(212, 175, 55, 0.5);
+            --shadow-neon-orange: 0 0 18px rgba(255, 69, 0, 0.5);
+            --shadow-neon-purple: 0 0 18px rgba(120, 81, 169, 0.5);
+            --shadow-neon-gold: 0 0 18px rgba(212, 175, 55, 0.5);
+            --font-title: 'Lalezar', cursive;
+            --font-body: 'Vazirmatn', sans-serif;
+            --transition-fast: 0.25s ease;
+            --transition-smooth: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-card: 16px;
+            --radius-modal: 20px;
+            --radius-btn: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ========== FLOATING EMOJIS LAYER ========== */
+        #emoji-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .floating-emoji {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0;
+            animation: floatUp var(--dur) var(--delay) infinite linear;
+            will-change: transform, opacity;
+            filter: blur(0.5px);
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) translateX(0) rotate(0deg) scale(0.6);
+                opacity: 0;
+            }
+            8% {
+                opacity: 0.55;
+            }
+            85% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-10vh) translateX(var(--drift)) rotate(var(--rot)) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* ========== MAIN WRAPPER ========== */
+        #app-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ========== LANDING PAGE ========== */
+        #landing-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 2rem;
+            transition: opacity var(--transition-smooth), transform var(--transition-smooth), visibility var(--transition-smooth);
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            position: relative;
+            z-index: 2;
+        }
+        #landing-view.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96);
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .landing-title {
+            font-family: var(--font-title);
+            font-size: clamp(4.5rem, 10vw, 8rem);
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.04em;
+            text-shadow:
+                0 0 15px rgba(212, 175, 55, 0.7),
+                0 0 40px rgba(212, 175, 55, 0.35),
+                0 0 80px rgba(255, 69, 0, 0.25),
+                0 4px 8px rgba(0, 0, 0, 0.6);
+            animation: titlePulse 3.5s ease-in-out infinite;
+            line-height: 1.1;
+        }
+        @keyframes titlePulse {
+            0%,
+            100% {
+                text-shadow: 0 0 15px rgba(212, 175, 55, 0.7), 0 0 40px rgba(212, 175, 55, 0.35), 0 0 80px rgba(255, 69, 0, 0.25);
+            }
+            50% {
+                text-shadow: 0 0 28px rgba(212, 175, 55, 0.95), 0 0 60px rgba(212, 175, 55, 0.5), 0 0 100px rgba(255, 69, 0, 0.4), 0 0 140px rgba(120, 81, 169, 0.3);
+            }
+        }
+        .landing-subtitle {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.05em;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        /* Landing Search Box */
+        .search-container-landing {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+        .search-input-landing {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.2rem;
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid var(--border-glass);
+            border-radius: 50px;
+            color: var(--text);
+            outline: none;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+        .search-input-landing::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+        }
+        .search-input-landing:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.3), 0 0 50px rgba(255, 69, 0, 0.15);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ========== RESULTS PAGE ========== */
+        #results-view {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 1rem 1.5rem 3rem;
+            flex-direction: column;
+            align-items: center;
+            transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+            opacity: 0;
+            transform: translateY(20px);
+            position: relative;
+            z-index: 2;
+        }
+        #results-view.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Results Header */
+        .results-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-glass);
+        }
+        .results-logo {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(212, 175, 55, 0.6), 0 0 30px rgba(212, 175, 55, 0.25);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+        }
+        .results-logo:hover {
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.9), 0 0 45px rgba(255, 69, 0, 0.4);
+        }
+        .search-container-nav {
+            flex: 1;
+            min-width: 250px;
+            max-width: 500px;
+            position: relative;
+        }
+        .search-input-nav {
+            width: 100%;
+            padding: 0.7rem 1.2rem;
+            font-size: 1rem;
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid var(--border-glass);
+            border-radius: 50px;
+            color: var(--text);
+            outline: none;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .search-input-nav::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        .search-input-nav:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .results-count-info {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            font-weight: 400;
+        }
+
+        /* Movie Grid */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+            width: 100%;
+            max-width: 1200px;
+            padding: 0.5rem 0;
+        }
+        @media (max-width: 600px) {
+            .movie-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 0.9rem;
+            }
+        }
+
+        /* Movie Card */
+        .movie-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-card);
+            padding: 1.3rem 1.1rem;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        .movie-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 69, 0, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(120, 81, 169, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .movie-card:hover {
+            transform: translateY(-6px) scale(1.03);
+            border-color: var(--border-gold);
+            box-shadow:
+                0 0 22px rgba(255, 69, 0, 0.35),
+                0 0 40px rgba(120, 81, 169, 0.25),
+                0 0 55px rgba(212, 175, 55, 0.18),
+                0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        .movie-card:hover::before {
+            opacity: 1;
+        }
+        .movie-card:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+
+        .card-title {
+            font-family: var(--font-title);
+            font-size: 1.35rem;
+            color: var(--text);
+            line-height: 1.3;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.15);
+            letter-spacing: 0.02em;
+        }
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
+        }
+        .card-rating {
+            color: var(--gold-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .card-genre {
+            color: var(--orange-glow);
+            font-weight: 500;
+        }
+        .card-year {
+            color: var(--purple-glow);
+            font-weight: 500;
+        }
+
+        /* ========== PAGINATION ========== */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .pagination-btn {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            border: 1.5px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            box-shadow: 0 0 16px rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--gold-light);
+        }
+        .pagination-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+        .pagination-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            filter: grayscale(40%);
+        }
+        .pagination-info {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        /* ========== MODAL OVERLAY ========== */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+        }
+        #modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #modal-box {
+            background: var(--bg-modal);
+            border: 1.5px solid var(--border-glass);
+            border-radius: var(--radius-modal);
+            padding: 2rem 1.8rem;
+            max-width: 580px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow:
+                0 0 35px rgba(255, 69, 0, 0.25),
+                0 0 55px rgba(120, 81, 169, 0.2),
+                0 20px 50px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transform: scale(0.85);
+            transition: transform var(--transition-smooth);
+            scroll-behavior: smooth;
+        }
+        #modal-overlay.active #modal-box {
+            transform: scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 0.8rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-glass);
+            color: var(--text);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            z-index: 5;
+            font-family: var(--font-body);
+        }
+        .modal-close-btn:hover {
+            background: rgba(255, 69, 0, 0.2);
+            border-color: var(--orange);
+            box-shadow: var(--shadow-neon-orange);
+            color: #fff;
+        }
+
+        .modal-title {
+            font-family: var(--font-title);
+            font-size: 2rem;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            margin-bottom: 0.8rem;
+            line-height: 1.3;
+            padding-left: 2.5rem;
+            letter-spacing: 0.03em;
+        }
+        .modal-description {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.2rem;
+            font-weight: 300;
+        }
+        .modal-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal-meta-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+        .modal-meta-tag.highlight {
+            border-color: var(--gold);
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .btn {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.7rem 1.5rem;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition-fast);
+            letter-spacing: 0.03em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        .btn-download {
+            background: var(--orange);
+            color: #fff;
+            box-shadow: 0 0 18px rgba(255, 69, 0, 0.4);
+            font-weight: 600;
+        }
+        .btn-download:hover {
+            background: #FF6B35;
+            box-shadow: 0 0 28px rgba(255, 69, 0, 0.6), 0 0 50px rgba(255, 69, 0, 0.25);
+            transform: translateY(-2px);
+        }
+        .btn-download:disabled,
+        .btn-download.disabled {
+            background: #444;
+            color: #888;
+            box-shadow: none;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .btn-favorite {
+            background: transparent;
+            border: 1.5px solid var(--border-glass);
+            color: var(--text);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+        .btn-favorite:hover {
+            border-color: var(--gold);
+            color: var(--gold-light);
+            box-shadow: 0 0 14px rgba(212, 175, 55, 0.3);
+        }
+        .btn-favorite.is-fav {
+            border-color: var(--gold);
+            color: var(--gold-light);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
+        }
+
+        /* ========== ERROR VIEW ========== */
+        #error-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-smooth), visibility var(--transition-smooth);
+            padding: 2rem;
+            text-align: center;
+        }
+        #error-view.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .error-icon {
+            font-size: 5rem;
+            animation: shake 0.6s ease-in-out;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-15px);
+            }
+            40% {
+                transform: translateX(15px);
+            }
+            60% {
+                transform: translateX(-10px);
+            }
+            80% {
+                transform: translateX(10px);
+            }
+        }
+        .error-title {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            color: var(--orange);
+            text-shadow: var(--shadow-neon-orange);
+        }
+        .error-message {
+            font-family: var(--font-body);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 450px;
+            line-height: 1.7;
+        }
+        .btn-retry {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow-neon-purple);
+            transition: all var(--transition-fast);
+            letter-spacing: 0.03em;
+        }
+        .btn-retry:hover {
+            background: #8B5FBF;
+            box-shadow: 0 0 30px rgba(120, 81, 169, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* ========== NO RESULTS (within results view) ========== */
+        .no-results-message {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+        .no-results-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ========== ACCESSIBILITY: FOCUS VISIBLE ========== */
+        *:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 3px;
+        }
+
+        /* ========== RESPONSIVE FINE-TUNING ========== */
+        @media (max-width: 768px) {
+            .results-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .search-container-nav {
+                max-width: 100%;
+            }
+            .modal-title {
+                font-size: 1.5rem;
+                padding-left: 2rem;
+            }
+            #modal-box {
+                padding: 1.5rem 1.2rem;
+                max-height: 80vh;
+            }
+            .landing-title {
+                font-size: clamp(3rem, 12vw, 5rem);
+            }
+        }
+        @media (max-width: 400px) {
+            .movie-grid {
+                grid-template-columns: 1fr;
+                gap: 0.7rem;
+            }
+            .card-title {
+                font-size: 1.15rem;
+            }
+            .pagination-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== FLOATING EMOJIS LAYER ==================== -->
+    <div id="emoji-layer" aria-hidden="true"></div>
+
+    <!-- ==================== ERROR VIEW ==================== -->
+    <div id="error-view" role="alert" aria-live="assertive">
+        <div class="error-icon">⚠️</div>
+        <h2 class="error-title">خطا در بارگذاری داده‌ها</h2>
+        <p class="error-message">متأسفانه اطلاعات فیلم‌ها بارگذاری نشد. لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش نمایید.</p>
+        <button class="btn-retry" onclick="location.reload()" aria-label="تلاش مجدد">🔄 تلاش مجدد</button>
+    </div>
+
+    <!-- ==================== MODAL OVERLAY ==================== -->
+    <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div id="modal-box">
+            <button class="modal-close-btn" id="modal-close-btn" aria-label="بستن">✕</button>
+            <h2 class="modal-title" id="modal-title"></h2>
+            <p class="modal-description" id="modal-description"></p>
+            <div class="modal-meta-row" id="modal-meta"></div>
+            <div class="modal-actions">
+                <a class="btn btn-download" id="modal-download-btn" href="#" target="_blank" rel="noopener noreferrer" aria-label="دانلود / تماشا">📥 دانلود / تماشا</a>
+                <button class="btn btn-favorite" id="modal-fav-btn" aria-label="علاقه‌مندی">⭐ افزودن به علاقه‌مندی‌ها</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== APP WRAPPER ==================== -->
+    <div id="app-wrapper">
+        <!-- LANDING VIEW -->
+        <div id="landing-view">
+            <h1 class="landing-title">Shahian</h1>
+            <p class="landing-subtitle">شاهین • جستجوی فیلم</p>
+            <div class="search-container-landing">
+                <input
+                type="text"
+                class="search-input-landing"
+                id="search-landing"
+                placeholder="🔍 نام فیلم را جستجو کنید..."
+                autocomplete="off"
+                aria-label="جستجوی فیلم"
+                >
+            </div>
+        </div>
+
+        <!-- RESULTS VIEW -->
+        <div id="results-view">
+            <div class="results-header">
+                <div class="results-logo" id="logo-btn" title="بازگشت به صفحه اصلی" role="button" tabindex="0" aria-label="شاهین - صفحه اصلی">Shahian</div>
+                <div class="search-container-nav">
+                    <input
+                    type="text"
+                    class="search-input-nav"
+                    id="search-nav"
+                    placeholder="🔍 جستجوی فیلم..."
+                    autocomplete="off"
+                    aria-label="جستجوی فیلم"
+                    >
+                </div>
+                <div class="results-count-info" id="results-count-info"></div>
+            </div>
+            <div class="movie-grid" id="movie-grid" role="list" aria-label="لیست فیلم‌ها"></div>
+            <div class="pagination-container" id="pagination-container"></div>
+            <div class="no-results-message" id="no-results-msg" style="display:none;">
+                <span class="no-results-emoji">🎬</span>
+                نتیجه‌ای یافت نشد. عبارت دیگری را جستجو کنید.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ==================== DOM REFERENCES ====================
+            const emojiLayer = document.getElementById('emoji-layer');
+            const landingView = document.getElementById('landing-view');
+            const resultsView = document.getElementById('results-view');
+            const searchLanding = document.getElementById('search-landing');
+            const searchNav = document.getElementById('search-nav');
+            const movieGrid = document.getElementById('movie-grid');
+            const paginationContainer = document.getElementById('pagination-container');
+            const resultsCountInfo = document.getElementById('results-count-info');
+            const noResultsMsg = document.getElementById('no-results-msg');
+            const logoBtn = document.getElementById('logo-btn');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalBox = document.getElementById('modal-box');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalMeta = document.getElementById('modal-meta');
+            const modalDownloadBtn = document.getElementById('modal-download-btn');
+            const modalFavBtn = document.getElementById('modal-fav-btn');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const errorView = document.getElementById('error-view');
+
+            // ==================== STATE ====================
+            let allMovies = [];
+            let filteredMovies = [];
+            let currentPage = 1;
+            const MOVIES_PER_PAGE = 20;
+            let currentModalMovie = null;
+            let debounceTimer = null;
+            const DEBOUNCE_DELAY = 350; // ms
+            let favorites = loadFromStorage('shahian_favorites', []);
+            const searchHistory = loadFromStorage('shahian_history', []);
+
+            // ==================== LOCAL STORAGE HELPERS ====================
+            function loadFromStorage(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    return raw ? JSON.parse(raw) : fallback;
+                } catch (e) {
+                    return fallback;
+                }
+            }
+
+            function saveToStorage(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } catch (e) {
+                    // Storage full or unavailable - silently fail
+                }
+            }
+
+            // ==================== FLOATING EMOJIS ====================
+            const EMOJI_SET = ['🎃', '☕', '🚏', '🎑', '📸', '🪄', '🎥', '🎬', '🎭'];
+            const EMOJI_COUNT = 28;
+
+            function createFloatingEmojis() {
+                const fragment = document.createDocumentFragment();
+                for (let i = 0; i < EMOJI_COUNT; i++) {
+                    const el = document.createElement('span');
+                    el.classList.add('floating-emoji');
+                    el.textContent = EMOJI_SET[i % EMOJI_SET.length];
+                    el.setAttribute('aria-hidden', 'true');
+                    // Randomize animation properties
+                    const dur = 14 + Math.random() * 22; // 14-36 seconds
+                    const delay = Math.random() * 20; // 0-20 seconds delay
+                    const drift = (Math.random() - 0.5) * 180; // horizontal drift in px
+                    const rot = (Math.random() - 0.5) * 540; // rotation degrees
+                    const startX = Math.random() * 95; // % from left
+                    el.style.cssText = `
+                --dur: ${dur}s;
+                --delay: ${delay}s;
+                --drift: ${drift}px;
+                --rot: ${rot}deg;
+                left: ${startX}%;
+                font-size: ${1.2 + Math.random() * 2.8}rem;
+                animation-duration: ${dur}s;
+                animation-delay: ${delay}s;
+              `;
+                    fragment.appendChild(el);
+                }
+                emojiLayer.appendChild(fragment);
+            }
+
+            // ==================== EMBEDDED SAMPLE DATA (Fallback) ====================
+            function getEmbeddedMovies() {
+                // Rich sample Persian movie data - 50 entries for meaningful pagination
+                const sampleData = [
+                    { title: 'جدایی نادر از سیمین', description: 'داستان زوجی که در آستانه جدایی هستند و با یک بحران اخلاقی پیچیده روبرو می‌شوند. فیلمی تحسین‌شده از اصغر فرهادی.',
+                        year: 1390, rating: 8.9, genre: 'درام', downloadUrl: 'https://example.com/dl/jodaei', streamUrl: 'https://example.com/watch/jodaei' },
+                    { title: 'فروشنده', description: 'زوجی که زندگی‌شان پس از یک حادثه خشونت‌آمیز دگرگون می‌شود و با چالش‌های اخلاقی روبرو می‌گردند.', year: 1395,
+                        rating: 8.5, genre: 'درام', link: 'https://example.com/dl/forushandeh' },
+                    { title: 'شهر موش‌ها', description: 'ماجراجویی موش‌های بامزه در شهری پر از رمز و راز و هیجان برای کودکان و خانواده‌ها.', year: 1364,
+                        rating: 7.8, genre: 'انیمیشن', watch_link: 'https://example.com/watch/shahre-mousha' },
+                    { title: 'آژانس شیشه‌ای', description: 'داستان مردی که در یک آژانس شیشه‌ای کار می‌کند و با بحران‌های اجتماعی و شخصی دست و پنجه نرم می‌کند.',
+                        year: 1376, rating: 8.2, genre: 'درام', download_link: 'https://example.com/dl/agens-shishei' },
+                    { title: 'مارمولک', description: 'کمدی‌ای درباره یک سارق که لباس روحانیت به تن می‌کند و ماجراهای خنده‌داری را تجربه می‌کند.',
+                        year: 1382, rating: 8.1, genre: 'کمدی', stream: 'https://example.com/stream/marmoulak',
+                    downloadUrl: 'https://example.com/dl/marmoulak' },
+                    { title: 'خورشید', description: 'داستان کودکانی که در خیابان‌های تهران برای یافتن گنج تلاش می‌کنند و با واقعیت‌های تلخ روبرو می‌شوند.',
+                        year: 1398, rating: 8.3, genre: 'درام', url: 'https://example.com/watch/khorshid' },
+                    { title: 'ابد و یک روز', description: 'خانواده‌ای در آستانه فروپاشی که با اعتیاد یکی از اعضای خود دست و پنجه نرم می‌کنند. درامی تأثیرگذار.',
+                        year: 1394, rating: 8.0, genre: 'درام', downloadUrl: 'https://example.com/dl/abad-va-yek-rooz' },
+                    { title: 'جهان با من برقص', description: 'داستان مردی که در آخرین روزهای زندگی خود دوستانش را برای یک مهمانی جمع می‌کند.', year: 1397,
+                        rating: 7.6, genre: 'درام', link: 'https://example.com/dl/jahan-ba-man-beraghs' },
+                    { title: 'متری شش و نیم', description: 'داستان یک پلیس که درگیر پرونده‌ای پیچیده از مواد مخدر می‌شود و با چالش‌های اخلاقی روبرو می‌گردد.',
+                        year: 1397, rating: 8.4, genre: 'جنایی', streamUrl: 'https://example.com/watch/metri-shesh-va-nim',
+                        download_link: 'https://example.com/dl/metri-shesh-va-nim' },
+                    { title: 'قهرمان', description: 'مردی که به خاطر یک عمل قهرمانانه از زندان آزاد می‌شود اما همه چیز آنطور که به نظر می‌رسد نیست.',
+                        year: 1400, rating: 8.2, genre: 'درام', watch_link: 'https://example.com/watch/ghahreman' },
+                    { title: 'شعله‌ور', description: 'داستان مردی که پس از سال‌ها از زندان آزاد می‌شود و به دنبال انتقام از کسانی است که به او خیانت کرده‌اند.',
+                        year: 1395, rating: 7.9, genre: 'اکشن', downloadUrl: 'https://example.com/dl/sholevar' },
+                    { title: 'آشغال‌های دوست‌داشتنی', description: 'کمدی درباره زباله‌هایی که زنده می‌شوند و ماجراهای بامزه‌ای را رقم می‌زنند.', year: 1391,
+                        rating: 7.2, genre: 'کمدی', link: 'https://example.com/dl/ashghal-dostdashtani' },
+                    { title: 'رستاخیز', description: 'حماسه‌ای تاریخی درباره قیام امام حسین (ع) در کربلا با جلوه‌های ویژه سینمایی باشکوه.', year: 1392,
+                        rating: 7.5, genre: 'تاریخی', stream: 'https://example.com/stream/rastakhiz' },
+                    { title: 'طعم گیلاس', description: 'مردی که به دنبال کسی می‌گردد تا پس از مرگش او را دفن کند. شاهکاری از عباس کیارستمی.', year: 1376,
+                        rating: 8.7, genre: 'درام', url: 'https://example.com/watch/tam-e-gilas' },
+                    { title: 'کلوزآپ', description: 'مستندی درام درباره مردی که خود را به جای یک کارگردان معروف جا زده و وارد زندگی یک خانواده می‌شود.',
+                        year: 1368, rating: 8.6, genre: 'مستند', downloadUrl: 'https://example.com/dl/close-up' },
+                    { title: 'بچه‌های آسمان', description: 'داستان خواهر و برادری که یک جفت کفش را به اشتراک می‌گذارند و در مسابقه دو شرکت می‌کنند.',
+                        year: 1375, rating: 8.3, genre: 'درام', download_link: 'https://example.com/dl/bacheha-aseman' },
+                    { title: 'زیر نور ماه', description: 'داستان طلبه جوانی که در آستانه مراسم تحلیف خود با بحران ایمان روبرو می‌شود.', year: 1378,
+                        rating: 7.4, genre: 'درام', link: 'https://example.com/dl/zire-noore-mah' },
+                    { title: 'نفس عمیق', description: 'داستان سه جوان که در جستجوی معنای زندگی در تهران مدرن سرگردان هستند.', year: 1381, rating: 7.0,
+                        genre: 'درام', watch_link: 'https://example.com/watch/nafas-amigh' },
+                    { title: 'کاغذ بی‌خط', description: 'داستان زنی خانه‌دار که رؤیای نویسنده شدن دارد و با موانع خانوادگی و اجتماعی روبرو می‌شود.',
+                        year: 1380, rating: 7.3, genre: 'درام', streamUrl: 'https://example.com/watch/kaghaz-bi-khat' },
+                    { title: 'شب‌های روشن', description: 'داستان عاشقانه استاد دانشگاهی که با زنی مرموز در خیابان‌های تهران آشنا می‌شود.', year: 1381,
+                        rating: 7.1, genre: 'عاشقانه', url: 'https://example.com/watch/shab-haye-roshan' },
+                    { title: 'مهمان مامان', description: 'کمدی گرم درباره خانواده‌ای که مهمان ناخوانده‌ای دارند و تلاش می‌کنند آبروداری کنند.',
+                        year: 1382, rating: 7.8, genre: 'کمدی', downloadUrl: 'https://example.com/dl/mehman-maman' },
+                    { title: 'درباره الی', description: 'گروهی از دوستان که به سفر شمال می‌روند و ناپدید شدن یکی از آنها همه چیز را تغییر می‌دهد.',
+                        year: 1387, rating: 8.8, genre: 'درام', stream: 'https://example.com/stream/darbare-eli',
+                        downloadUrl: 'https://example.com/dl/darbare-eli' },
+                    { title: 'چهارشنبه سوری', description: 'داستان تنش‌های یک خانواده در آستانه چهارشنبه سوری و رازهایی که فاش می‌شود.', year: 1384,
+                        rating: 8.0, genre: 'درام', link: 'https://example.com/dl/chaharshanbe-souri' },
+                    { title: 'گذشته', description: 'مردی ایرانی که به فرانسه بازمی‌گردد تا طلاق خود را نهایی کند و با گذشته پیچیده‌ای روبرو می‌شود.',
+                        year: 1391, rating: 7.9, genre: 'درام', watch_link: 'https://example.com/watch/gozashteh' },
+                    { title: 'اژدها وارد می‌شود', description: 'داستانی سورئال و مرموز در جزیره قشم با ترکیبی از مستند و داستان.', year: 1394, rating: 7.5,
+                        genre: 'علمی تخیلی', download_link: 'https://example.com/dl/ejdeha-vared-mishavad' },
+                    { title: 'مغزهای کوچک زنگ‌زده', description: 'داستان برادرانی که در حاشیه شهر زندگی می‌کنند و با دنیای خلافکاران درگیر می‌شوند.',
+                        year: 1396, rating: 7.7, genre: 'جنایی', streamUrl: 'https://example.com/watch/maghz-haye-kouchak' },
+                    { title: 'تنگه ابوقریب', description: 'حماسه‌ای درباره رشادت‌های رزمندگان در عملیات والفجر ۸ در تنگه ابوقریب.', year: 1396,
+                        rating: 7.6, genre: 'جنگی', url: 'https://example.com/watch/tange-abogharib' },
+                    { title: 'لاتاری', description: 'داستان زوج جوانی که برنده لاتاری می‌شوند اما این برنده شدن دردسرهای زیادی به همراه دارد.',
+                        year: 1396, rating: 7.2, genre: 'درام', downloadUrl: 'https://example.com/dl/lottery' },
+                    { title: 'هزارپا', description: 'کمدی درباره دو دوست که در تهران قدیم به دنبال یافتن گنج و تغییر زندگی خود هستند.', year: 1396,
+                        rating: 7.4, genre: 'کمدی', link: 'https://example.com/dl/hezarpa', stream: 'https://example.com/stream/hezarpa' },
+                    { title: 'تگزاس', description: 'کمدی ماجراجویانه درباره ایرانی‌هایی که در تگزاس با موقعیت‌های خنده‌دار روبرو می‌شوند.', year: 1396,
+                        rating: 6.9, genre: 'کمدی', watch_link: 'https://example.com/watch/texas' },
+                    { title: 'مصادره', description: 'کمدی سیاسی درباره مردی که اموالش مصادره می‌شود و تلاش می‌کند آنها را پس بگیرد.', year: 1396,
+                        rating: 7.0, genre: 'کمدی', downloadUrl: 'https://example.com/dl/mosadereh' },
+                    { title: 'به وقت شام', description: 'داستان خلبانان ایرانی که در سوریه با داعش مبارزه می‌کنند. اکشن و هیجانی.', year: 1396,
+                        rating: 6.8, genre: 'اکشن', streamUrl: 'https://example.com/watch/be-vaghte-sham' },
+                    { title: 'دارکوب', description: 'داستان زنی که فرزندش را از دست داده و در جستجوی عدالت با سیستم قضایی درگیر می‌شود.', year: 1396,
+                        rating: 7.3, genre: 'درام', link: 'https://example.com/dl/darkoub' },
+                    { title: 'عرق سرد', description: 'داستان زنی که همسرش او را از حضور در تیم ملی فوتبال منع می‌کند و مبارزه او برای آزادی.', year: 1396,
+                        rating: 7.1, genre: 'درام', url: 'https://example.com/watch/aragh-sard' },
+                    { title: 'خوک', description: 'کمدی سیاه درباره کارگردانی که در لیست سیاه قاتلان سریالی قرار می‌گیرد و از این توجه لذت می‌برد.',
+                        year: 1396, rating: 7.0, genre: 'کمدی', download_link: 'https://example.com/dl/khook' },
+                    { title: 'سرو زیر آب', description: 'داستان حماسی درباره رشادت‌های غواصان ایرانی در دوران جنگ تحمیلی.', year: 1396, rating: 7.5,
+                        genre: 'جنگی', stream: 'https://example.com/stream/sarv-zire-ab' },
+                    { title: 'ملی و راه‌های نرفته‌اش', description: 'داستان عاشقانه‌ای در دل تهران با تمی از شعر و ادبیات فارسی.', year: 1395,
+                        rating: 7.2, genre: 'عاشقانه', watch_link: 'https://example.com/watch/meli-va-rahha' },
+                    { title: 'ایستاده در غبار', description: 'بیوگرافی احمد متوسلیان، فرمانده دلاور ایرانی که در لبنان ربوده شد.', year: 1394,
+                        rating: 8.1, genre: 'بیوگرافی', downloadUrl: 'https://example.com/dl/istade-dar-ghobar' },
+                    { title: 'بدون قرار قبلی', description: 'داستان زنی که پس از ۳۰ سال به ایران بازمی‌گردد تا با گذشته خود روبرو شود.', year: 1400,
+                        rating: 7.4, genre: 'درام', link: 'https://example.com/dl/bedune-gharar' },
+                    { title: 'علفزار', description: 'داستان قضاتی که درگیر پرونده‌ای پیچیده از تجاوز گروهی می‌شوند و با چالش‌های اخلاقی روبرو می‌گردند.',
+                        year: 1400, rating: 7.6, genre: 'جنایی', streamUrl: 'https://example.com/watch/alafzar' },
+                    { title: 'برادران لیلا', description: 'داستان خانوادگی درباره برادرانی که برای نجات اقتصاد خانواده دست به هر کاری می‌زنند.',
+                        year: 1401, rating: 8.3, genre: 'درام', downloadUrl: 'https://example.com/dl/baradaran-leila',
+                        url: 'https://example.com/watch/baradaran-leila' },
+                    { title: 'جنگ جهانی سوم', description: 'کارگری که وارد دنیای سینما می‌شود و زندگی‌اش با یک تراژدی واقعی گره می‌خورد.', year: 1401,
+                        rating: 8.0, genre: 'درام', watch_link: 'https://example.com/watch/jang-jahani-sevom' },
+                    { title: 'عنکبوت', description: 'داستان واقعی قاتل سریالی که زنان خیابانی را به قتل می‌رساند و تعقیب پلیس برای دستگیری او.',
+                        year: 1399, rating: 7.8, genre: 'جنایی', download_link: 'https://example.com/dl/ankaboot' },
+                    { title: 'روز صفر', description: 'داستان مأمور امنیتی که برای دستگیری یک تروریست بین‌المللی وارد عمل می‌شود.', year: 1399,
+                        rating: 7.3, genre: 'اکشن', stream: 'https://example.com/stream/rooz-sefr' },
+                    { title: 'شنای پروانه', description: 'داستان زنی که فیلمی از او در فضای مجازی منتشر می‌شود و تلاش او برای یافتن عامل انتشار.',
+                        year: 1398, rating: 7.7, genre: 'درام', link: 'https://example.com/dl/shena-parvaneh' },
+                    { title: 'درخت گردو', description: 'داستان واقعی فاجعه بمباران شیمیایی سردشت و تلاش یک پدر برای نجات خانواده‌اش.', year: 1399,
+                        rating: 7.5, genre: 'درام', url: 'https://example.com/watch/derakht-gerdo' },
+                    { title: 'منصور', description: 'بیوگرافی منصور ستاری، فرمانده نیروی هوایی ارتش ایران و تلاش‌های او برای خودکفایی نظامی.',
+                        year: 1399, rating: 7.2, genre: 'بیوگرافی', downloadUrl: 'https://example.com/dl/mansour' },
+                    { title: 'دینامیت', description: 'کمدی پرفروش درباره دو دوست که ناخواسته وارد ماجراهای پلیسی و خنده‌دار می‌شوند.', year: 1400,
+                        rating: 7.0, genre: 'کمدی', watch_link: 'https://example.com/watch/dynamite',
+                    streamUrl: 'https://example.com/stream/dynamite' },
+                    { title: 'بی‌همه چیز', description: 'داستان زنی که پس از ۲۰ سال به روستای زادگاهش بازمی‌گردد و با رازهای گذشته روبرو می‌شود.',
+                        year: 1400, rating: 7.3, genre: 'درام', link: 'https://example.com/dl/bi-hame-chiz' },
+                    { title: 'نمور', description: 'داستان مرموز قتلی در یک روستای شمال ایران و تحقیقات پلیس برای کشف حقیقت.', year: 1400,
+                        rating: 7.1, genre: 'جنایی', download_link: 'https://example.com/dl/namour' },
+                ];
+                return sampleData;
+            }
+
+            // ==================== DATA LOADING ====================
+            async function loadMovies() {
+                try {
+                    const response = await fetch('movies.json');
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    const json = await response.json();
+                    const normalized = normalizeMovieData(json);
+                    if (normalized.length === 0) throw new Error('Empty dataset');
+                    return normalized;
+                } catch (fetchError) {
+                    console.warn('⚠️ بارگذاری movies.json失敗 شد، استفاده از داده‌های نمونه:', fetchError.message);
+                    // Fall back to embedded data
+                    const embedded = getEmbeddedMovies();
+                    if (embedded.length === 0) {
+                        throw new Error('هیچ داده‌ای در دسترس نیست');
+                    }
+                    return embedded;
+                }
+            }
+
+            function normalizeMovieData(raw) {
+                // Handle multiple formats: array, {movies: [...]}, {data: [...]}, {items: [...]}
+                let moviesArray = null;
+                if (Array.isArray(raw)) {
+                    moviesArray = raw;
+                } else if (raw && typeof raw === 'object') {
+                    if (Array.isArray(raw.movies)) moviesArray = raw.movies;
+                    else if (Array.isArray(raw.data)) moviesArray = raw.data;
+                    else if (Array.isArray(raw.items)) moviesArray = raw.items;
+                }
+                if (!Array.isArray(moviesArray) || moviesArray.length === 0) {
+                    // If raw is object with numeric keys or other structure, try extracting values
+                    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+                        const vals = Object.values(raw).filter(v => typeof v === 'object' && v !== null && v.title);
+                        if (vals.length > 0) moviesArray = vals;
+                    }
+                }
+                if (!Array.isArray(moviesArray)) return [];
+                // Normalize each movie: ensure it has expected fields
+                return moviesArray.map((m, idx) => ({
+                    id: m.id || m._id || ('movie-' + idx),
+                    title: m.title || m.name || m.Title || 'بدون عنوان',
+                    description: m.description || m.desc || m.summary || m.Description || '',
+                    year: m.year || m.Year || m.release_year || null,
+                    rating: m.rating || m.Rating || m.imdb_rating || null,
+                    genre: m.genre || m.Genre || m.category || m.type || '',
+                    // URL keys
+                    downloadUrl: m.downloadUrl || null,
+                    link: m.link || null,
+                    streamUrl: m.streamUrl || null,
+                    url: m.url || null,
+                    watch_link: m.watch_link || null,
+                    download_link: m.download_link || null,
+                    stream: m.stream || null,
+                }));
+            }
+
+            // ==================== URL DETECTION ====================
+            function getMovieStreamUrl(movie) {
+                const keys = ['downloadUrl', 'link', 'streamUrl', 'url', 'watch_link', 'download_link', 'stream'];
+                for (const key of keys) {
+                    const val = movie[key];
+                    if (val && typeof val === 'string' && val.trim().length > 0) {
+                        return val.trim();
+                    }
+                }
+                return null;
+            }
+
+            // ==================== SEARCH & FILTER ====================
+            function filterMovies(query) {
+                const q = query.trim().toLowerCase();
+                if (!q) return [...allMovies];
+                return allMovies.filter(m => {
+                    const title = (m.title || '').toLowerCase();
+                    const desc = (m.description || '').toLowerCase();
+                    const genre = (m.genre || '').toLowerCase();
+                    return title.includes(q) || desc.includes(q) || genre.includes(q);
+                });
+            }
+
+            function handleSearchInput(value) {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    performSearch(value);
+                }, DEBOUNCE_DELAY);
+            }
+
+            function performSearch(query) {
+                const trimmed = query.trim();
+                if (!trimmed) {
+                    // Return to landing page
+                    showLandingView();
+                    filteredMovies = [];
+                    currentPage = 1;
+                    return;
+                }
+                filteredMovies = filterMovies(trimmed);
+                currentPage = 1;
+                if (filteredMovies.length > 0) {
+                    showResultsView();
+                    renderResults();
+                    // Save to search history
+                    addToSearchHistory(trimmed);
+                } else {
+                    showResultsView();
+                    renderEmptyResults();
+                }
+                // Sync both search inputs
+                syncSearchInputs(trimmed);
+            }
+
+            function syncSearchInputs(value) {
+                if (document.activeElement !== searchLanding && searchLanding.value !== value) {
+                    searchLanding.value = value;
+                }
+                if (document.activeElement !== searchNav && searchNav.value !== value) {
+                    searchNav.value = value;
+                }
+            }
+
+            function addToSearchHistory(query) {
+                const idx = searchHistory.indexOf(query);
+                if (idx > -1) searchHistory.splice(idx, 1);
+                searchHistory.unshift(query);
+                if (searchHistory.length > 15) searchHistory.pop();
+                saveToStorage('shahian_history', searchHistory);
+            }
+
+            // ==================== VIEW MANAGEMENT ====================
+            function showLandingView() {
+                landingView.classList.remove('hidden');
+                resultsView.classList.remove('active');
+                resultsView.style.display = 'none';
+                searchLanding.value = '';
+                searchNav.value = '';
+                filteredMovies = [];
+                currentPage = 1;
+                // Focus landing search
+                setTimeout(() => searchLanding.focus(), 100);
+            }
+
+            function showResultsView() {
+                landingView.classList.add('hidden');
+                resultsView.style.display = 'flex';
+                // Force reflow for transition
+                resultsView.offsetHeight;
+                resultsView.classList.add('active');
+            }
+
+            // ==================== RENDER RESULTS ====================
+            function renderResults() {
+                if (filteredMovies.length === 0) {
+                    renderEmptyResults();
+                    return;
+                }
+                noResultsMsg.style.display = 'none';
+                movieGrid.style.display = 'grid';
+                paginationContainer.style.display = 'flex';
+
+                const totalPages = Math.ceil(filteredMovies.length / MOVIES_PER_PAGE);
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+
+                const startIdx = (currentPage - 1) * MOVIES_PER_PAGE;
+                const endIdx = Math.min(startIdx + MOVIES_PER_PAGE, filteredMovies.length);
+                const pageMovies = filteredMovies.slice(startIdx, endIdx);
+
+                // Update results count info
+                resultsCountInfo.textContent =
+                    `نمایش ${startIdx + 1}–${endIdx} از ${filteredMovies.length} نتیجه`;
+
+                // Build cards
+                const fragment = document.createDocumentFragment();
+                pageMovies.forEach(movie => {
+                    const card = createMovieCard(movie);
+                    fragment.appendChild(card);
+                });
+                movieGrid.innerHTML = '';
+                movieGrid.appendChild(fragment);
+
+                // Build pagination
+                renderPagination(totalPages);
+
+                // Smooth scroll to top of results
+                resultsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function renderEmptyResults() {
+                movieGrid.innerHTML = '';
+                movieGrid.style.display = 'none';
+                paginationContainer.innerHTML = '';
+                paginationContainer.style.display = 'none';
+                noResultsMsg.style.display = 'block';
+                resultsCountInfo.textContent = '۰ نتیجه';
+            }
+
+            function createMovieCard(movie) {
+                const card = document.createElement('div');
+                card.classList.add('movie-card');
+                card.setAttribute('role', 'listitem');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', movie.title);
+                card.innerHTML = `
+              <div class="card-title">${escapeHTML(movie.title)}</div>
+              <div class="card-meta">
+                ${movie.year ? `<span class="card-year">📅 ${movie.year}</span>` : ''}
+                ${movie.rating ? `<span class="card-rating">⭐ ${movie.rating}</span>` : ''}
+                ${movie.genre ? `<span class="card-genre">🎭 ${movie.genre}</span>` : ''}
+              </div>
+            `;
+                card.addEventListener('click', () => openModal(movie));
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openModal(movie);
+                    }
+                });
+                return card;
+            }
+
+            function renderPagination(totalPages) {
+                paginationContainer.innerHTML = '';
+                if (totalPages <= 1) {
+                    // Still show page info
+                    const info = document.createElement('span');
+                    info.classList.add('pagination-info');
+                    info.textContent = `صفحه ۱ از ۱`;
+                    paginationContainer.appendChild(info);
+                    return;
+                }
+
+                const prevBtn = document.createElement('button');
+                prevBtn.classList.add('pagination-btn');
+                prevBtn.textContent = '◀ قبلی';
+                prevBtn.disabled = currentPage <= 1;
+                prevBtn.setAttribute('aria-label', 'صفحه قبلی');
+                prevBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderResults();
+                        resultsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+
+                const info = document.createElement('span');
+                info.classList.add('pagination-info');
+                info.textContent = `صفحه ${currentPage} از ${totalPages}`;
+
+                const nextBtn = document.createElement('button');
+                nextBtn.classList.add('pagination-btn');
+                nextBtn.textContent = 'بعدی ▶';
+                nextBtn.disabled = currentPage >= totalPages;
+                nextBtn.setAttribute('aria-label', 'صفحه بعدی');
+                nextBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderResults();
+                        resultsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+
+                paginationContainer.appendChild(prevBtn);
+                paginationContainer.appendChild(info);
+                paginationContainer.appendChild(nextBtn);
+            }
+
+            // ==================== MODAL ====================
+            function openModal(movie) {
+                currentModalMovie = movie;
+                modalTitle.textContent = movie.title;
+                modalDescription.textContent = movie.description || 'توضیحاتی موجود نیست.';
+                // Build meta tags
+                modalMeta.innerHTML = '';
+                if (movie.year) {
+                    const tag = document.createElement('span');
+                    tag.classList.add('modal-meta-tag');
+                    tag.textContent = '📅 سال: ' + movie.year;
+                    modalMeta.appendChild(tag);
+                }
+                if (movie.rating) {
+                    const tag = document.createElement('span');
+                    tag.classList.add('modal-meta-tag', 'highlight');
+                    tag.textContent = '⭐ امتیاز: ' + movie.rating;
+                    modalMeta.appendChild(tag);
+                }
+                if (movie.genre) {
+                    const tag = document.createElement('span');
+                    tag.classList.add('modal-meta-tag');
+                    tag.textContent = '🎭 ژانر: ' + movie.genre;
+                    modalMeta.appendChild(tag);
+                }
+
+                // Download/Stream button
+                const streamUrl = getMovieStreamUrl(movie);
+                if (streamUrl) {
+                    modalDownloadBtn.href = streamUrl;
+                    modalDownloadBtn.classList.remove('disabled');
+                    modalDownloadBtn.removeAttribute('disabled');
+                    modalDownloadBtn.textContent = '📥 دانلود / تماشا';
+                    modalDownloadBtn.style.pointerEvents = 'auto';
+                } else {
+                    modalDownloadBtn.href = '#';
+                    modalDownloadBtn.classList.add('disabled');
+                    modalDownloadBtn.setAttribute('disabled', '');
+                    modalDownloadBtn.textContent = '🚫 لینکی موجود نیست';
+                    modalDownloadBtn.style.pointerEvents = 'none';
+                }
+
+                // Favorite button
+                updateFavButton(movie);
+
+                // Show modal with animation
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                // Focus trap - focus the modal box
+                setTimeout(() => modalBox.focus(), 100);
+
+                // Save to history
+                addToSearchHistory(movie.title);
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                currentModalMovie = null;
+            }
+
+            function updateFavButton(movie) {
+                const movieId = movie.id;
+                const isFav = favorites.includes(movieId);
+                if (isFav) {
+                    modalFavBtn.classList.add('is-fav');
+                    modalFavBtn.textContent = '⭐ حذف از علاقه‌مندی‌ها';
+                } else {
+                    modalFavBtn.classList.remove('is-fav');
+                    modalFavBtn.textContent = '☆ افزودن به علاقه‌مندی‌ها';
+                }
+            }
+
+            function toggleFavorite() {
+                if (!currentModalMovie) return;
+                const movieId = currentModalMovie.id;
+                const idx = favorites.indexOf(movieId);
+                if (idx > -1) {
+                    favorites.splice(idx, 1);
+                } else {
+                    favorites.push(movieId);
+                }
+                saveToStorage('shahian_favorites', favorites);
+                updateFavButton(currentModalMovie);
+            }
+
+            // ==================== EVENT LISTENERS ====================
+            searchLanding.addEventListener('input', (e) => {
+                handleSearchInput(e.target.value);
+            });
+            searchLanding.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(debounceTimer);
+                    performSearch(searchLanding.value);
+                }
+            });
+
+            searchNav.addEventListener('input', (e) => {
+                handleSearchInput(e.target.value);
+            });
+            searchNav.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    clearTimeout(debounceTimer);
+                    performSearch(searchNav.value);
+                }
+            });
+
+            logoBtn.addEventListener('click', () => {
+                showLandingView();
+            });
+            logoBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    showLandingView();
+                }
+            });
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            modalFavBtn.addEventListener('click', toggleFavorite);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (modalOverlay.classList.contains('active')) {
+                        closeModal();
+                    }
+                }
+            });
+
+            // ==================== ERROR VIEW ====================
+            function showErrorView() {
+                errorView.classList.add('active');
+                landingView.classList.add('hidden');
+                resultsView.classList.remove('active');
+                resultsView.style.display = 'none';
+            }
+
+            // ==================== UTILITY ====================
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ==================== INITIALIZATION ====================
+            async function init() {
+                // Create floating emojis
+                createFloatingEmojis();
+
+                // Load movie data
+                try {
+                    allMovies = await loadMovies();
+                    if (allMovies.length === 0) {
+                        throw new Error('داده‌های خالی');
+                    }
+                    console.log(`✅ ${allMovies.length} فیلم با موفقیت بارگذاری شد.`);
+                } catch (err) {
+                    console.error('❌ خطای بحرانی در بارگذاری داده‌ها:', err.message);
+                    showErrorView();
+                    return;
+                }
+
+                // Initial state: landing page
+                showLandingView();
+                searchLanding.focus();
+
+                console.log('🎬 Shahian | شاهین - آماده به کار');
+                console.log('💡 راهنما: جستجو کنید، روی کارت‌ها کلیک کنید، فیلم‌ها را به علاقه‌مندی اضافه کنید.');
+            }
+
+            // Start the app
+            init();
+        })();
+    </script>
+</body>
+</html>
